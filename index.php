@@ -1,13 +1,5 @@
 <?php
 session_start();
-
-$R2_ASSET_URL = 'https://pub-713a8976c18a46cbb1c4eccac3de6a2a.r2.dev/assets';
-
-function asset_url($file)
-{
-    global $R2_ASSET_URL;
-    return $R2_ASSET_URL . '/' . ltrim($file, '/');
-}
 ?>
 
 <!DOCTYPE html>
