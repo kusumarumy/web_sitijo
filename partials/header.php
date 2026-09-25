@@ -1,7 +1,7 @@
 <header class="header">
   <div class="logo-group">
-    <img src="/assets/jogja.png" alt="Logo Jogja">
-    <img src="/assets/logo.png" alt="Logo DPUPKP">
+<img src="<?= asset_url('jogja.png') ?>" alt="Logo Jogja">
+<img src="<?= asset_url('logo.png') ?>" alt="Logo DPUPKP">
   </div>
   <div class="title-group">
     <h1>SITIJO</h1>
