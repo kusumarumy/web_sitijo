@@ -1,0 +1,180 @@
+    :root {
+      --header: 70px;
+      --brand: #0f3073;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    #map {
+      position: absolute;
+      top: var(--header);
+      bottom: 0;
+      right: 0;
+      left: 0;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: var(--header);
+      left: 0;
+      bottom: 0;
+      width: 250px;
+      background: #ffffffee;
+      backdrop-filter: blur(6px);
+      border-right: 1px solid #e0e0e0;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      font-size: 14px;
+      z-index: 1100;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+      border-radius: 0 10px 10px 0;
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    .sidebar h5,
+    .sidebar h6 {
+      margin-top: 15px;
+      margin-bottom: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      color: #02106eff;
+      text-align: center;
+    }
+
+    .sidebar input,
+    .sidebar select {
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      margin-bottom: 8px;
+    }
+
+    .toggle-btn {
+      position: fixed;
+      top: calc(var(--header) + 10px);
+      left: 10px;
+      z-index: 1200;
+      background: #ffcc00ff;
+      color: #09017dff;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .legend-container {
+      background: white;
+      padding: 8px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      font-size: 13px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .layer-class {
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: #f8f9fa;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 500;
+      font-size: 12px;
+      transition: background 0.2s;
+    }
+
+    .layer-class:hover {
+      background: #e9ecef;
+    }
+
+    .layer-sub {
+      display: none;
+      margin-left: 15px;
+      padding: 5px 0;
+    }
+
+    .layer-sub div {
+      padding: 5px 0;
+      font-size: 13px;
+    }
+
+    .layer-sub input {
+      margin-right: 5px;
+    }
+
+    .legend-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .legend-header .toggle {
+      font-size: 15px;
+      color: #06005cff;
+    }
+
+    .legend-content div {
+      display: flex;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+
+    .legend-content span {
+      display: inline-block;
+      width: 18px;
+      height: 12px;
+      margin-right: 6px;
+      border: 1px solid #001659ff;
+    }
+
+    .locate-button {
+      background: white;
+      border-radius: 4px;
+      padding: 6px;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .locate-button img {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+
+    .coords-info {
+      background: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .leaflet-control-compass {
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .leaflet-control-compass img {
+      width: 28px;
+      height: 28px;
+    }
