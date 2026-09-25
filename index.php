@@ -8,9 +8,10 @@ function asset_url($file)
     global $R2_ASSET_URL;
 
     if (!empty($R2_ASSET_URL)) {
-        return rtrim($R2_ASSET_URL, '/') . '/' . ltrim($file, '/');
+        return rtrim($R2_ASSET_URL, '/') . '/assets/' . ltrim($file, '/');
     }
-    return '/' . ltrim($file, '/');
+
+    return '/assets/' . ltrim($file, '/');
 }
 ?>
 
