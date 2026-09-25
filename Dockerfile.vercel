@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . /app
 
+COPY Caddyfile /etc/caddy/Caddyfile
+
 ENV PORT=80
 
 CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
