@@ -1,5 +1,13 @@
 <?php
 session_start();
+
+$R2_ASSET_URL = 'https://pub-713a8976c18a46cbb1c4eccac3de6a2a.r2.dev/assets';
+
+function asset_url($file)
+{
+    global $R2_ASSET_URL;
+    return $R2_ASSET_URL . '/' . ltrim($file, '/');
+}
 ?>
 
 <!DOCTYPE html>
@@ -587,7 +595,7 @@ session_start();
   <div class="main">
     <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
       <div class="carousel-inner">
-        <div class="carousel-item active fullheight" style="background-image:url('assets/background.jpg');">
+        <div class="carousel-item active fullheight" style="background-image:url('<?= asset_url('background.jpg') ?>');">
           <div class="carousel-caption text-start">
             <h1>Satu Data, Satu Peta Infrastruktur Kota Yogyakarta</h1>
             <p>Sistem Informasi Infrastruktur Kota Yogyakarta (SITIJO) merupakan platform digital internal Dinas Pekerjaan Umum, Perumahan dan Kawasan Permukiman Kota Yogyakarta yang menyajikan data spasial dan data atribut penunjang infrastruktur Kota Yogyakarta.</p>
@@ -598,13 +606,13 @@ session_start();
             <?php endif; ?>
           </div>
         </div>
-        <div class="carousel-item fullheight" style="background-image:url('assets/background.jpg');">
+        <div class="carousel-item fullheight" style="background-image:url('<?= asset_url('background.jpg') ?>');">
           <div class="carousel-caption">
             <h1>Kolaborasi dan Integrasi Data</h1>
             <p>Website based Geographic Information System (WEBGIS) SITIJO dapat digunakan sebagai sarana koordinasi antar Bidang dan UPT di lingkup DPUPKP Kota Yogyakarta untuk pengelolaan data infrastruktur.</p>
           </div>
         </div>
-        <div class="carousel-item fullheight" style="background-image:url('assets/background.jpg');">
+        <div class="carousel-item fullheight" style="background-image:url('<?= asset_url('background.jpg') ?>');">
           <div class="carousel-caption text-end">
             <h1>Akses Terbatas dan Terlindungi</h1>
             <p>Platform digital ini hanya dapat diakses oleh Bidang, UPT, dan beberapa pihak terkait di lingkup DPUPKP Kota Yogyakarta.</p>
@@ -641,7 +649,7 @@ session_start();
         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
           <a href="<?= link_or_signin('index.php#organisasi') ?>">
             <div class="fitur-card" data-tooltip="Informasi profil dari Dinas Pekerjaan Umum, Perumahan, dan Kawasan Permukiman. Selain itu terdapat profil Bidang dan UPT terkait dengan WEBGIS SITIJO.">
-              <img src="assets/profil.png" alt="Profil" class="fitur-icon">
+              <img src="<?= asset_url('profil.png') ?>" alt="Profil" class="fitur-icon">
               <h6>Informasi Profil DPUPKP Kota Yogyakarta</h6>
             </div>
           </a>
@@ -649,7 +657,7 @@ session_start();
         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
           <a href="<?= link_or_signin('frontend/jenisdata.php') ?>">
             <div class="fitur-card" data-tooltip="Informasi jenis ketersediaan data infrastruktur yang tersedia pada WEBGIS SITIJO. ">
-              <img src="assets/data.png" alt="Jenis data" class="fitur-icon">
+              <img src="<?= asset_url('data.png') ?>" alt="Jenis data" class="fitur-icon">
               <h6>Ketersediaan Data Infrastruktur</h6>
             </div>
           </a>
@@ -657,7 +665,7 @@ session_start();
         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
           <a href="<?= link_or_signin('frontend/peta.php') ?>">
             <div class="fitur-card" data-tooltip="Visualisasi data infrastruktur secara interaktif dilengkapi dengan komponen peta pendukung.">
-              <img src="assets/peta.png" alt="Peta" class="fitur-icon">
+              <img src="<?= asset_url('peta.png') ?>" alt="Peta" class="fitur-icon">
               <h6>Peta Infrastruktur</h6>
             </div>
           </a>
@@ -665,7 +673,7 @@ session_start();
         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
           <a href="<?= link_or_signin('backend/data/update_data.php') ?>">
             <div class="fitur-card" data-tooltip="Fitur update data infrastruktur memungkinkan pengguna dapat mengubah atribut dan menghapus data, yang dapat terintegrasi dengan database dan WEBGIS.">
-              <img src="assets/update.png" alt="Update" class="fitur-icon">
+              <img src="<?= asset_url('update.png') ?>" alt="Update" class="fitur-icon">
               <h6>Update Data Infrastruktur</h6>
             </div>
           </a>
@@ -673,7 +681,7 @@ session_start();
         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
           <a href="<?= link_or_signin('backend/data/tambah_data.php') ?>">
             <div class="fitur-card" data-tooltip="Fitur tambah data infrastruktur memungkinkan pengguna dapat menambah data geometri yang dapat dilengkapi dengan informasi non spasial (atribut data).">
-              <img src="assets/tambah.png" alt="Tambah" class="fitur-icon">
+              <img src="<?= asset_url('tambah.png') ?>" alt="Tambah" class="fitur-icon">
               <h6>Tambah Data Infrastruktur</h6>
             </div>
           </a>
@@ -681,7 +689,7 @@ session_start();
         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
           <a href="<?= link_or_signin('backend/data/download_data.php') ?>">
             <div class="fitur-card" data-tooltip="Fitur download data infrastruktur memungkinkan pengguna dapat mengunduh data geometri yang diekstrak dengan formast shapefile.">
-              <img src="assets/download.png" alt="Download" class="fitur-icon">
+              <img src="<?= asset_url('download.png') ?>" alt="Download" class="fitur-icon">
               <h6>Download Data Infrastruktur</h6>
             </div>
           </a>
@@ -689,7 +697,7 @@ session_start();
         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
           <a href="<?= link_or_signin('backend/data/riwayat_akses.php') ?>">
             <div class="fitur-card" data-tooltip="Riwayat akses pengguna memungkinkan administrator mengevaluasi dan mengidentifikasi akses pengguna terhadap WEBGIS SITIJO.">
-              <img src="assets/riwayat.png" alt="Riwayat Akses" class="fitur-icon">
+              <img src="<?= asset_url('riwayat.png') ?>" alt="Riwayat Akses" class="fitur-icon">
               <h6>Riwayat Akses Pengguna</h6>
             </div>
           </a>
@@ -697,7 +705,7 @@ session_start();
         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
           <a href="<?= link_or_signin('frontend/panduan.php') ?>">
             <div class="fitur-card" data-tooltip="Panduan penggunaan WEBGIS SITIJO memungkinkan pengguna mengakses WEBGIS dengan 2 cara yaitu melalui booklet pengguna atau video tutorial.">
-              <img src="assets/panduan.png" alt="Panduan" class="fitur-icon">
+              <img src="<?= asset_url('panduan.png') ?>" alt="Panduan" class="fitur-icon">
               <h6>Panduan Penggunaan WEBGIS SITIJO</h6>
             </div>
           </a>
@@ -752,7 +760,7 @@ session_start();
         <div class="col-6 col-md-4 col-lg-3 bidang-item">
           <div class="card border-0 shadow-sm text-center p-3 h-100">
             <div class="mx-auto mb-3" style="width:100px; height:100px; border-radius:50%; overflow:hidden;">
-              <img src="assets/penataan_bangunan.png" alt="Bidang Penataan Bangunan" class="img-fluid">
+              <img src="<?= asset_url('penataan_bangunan.png') ?>" alt="Bidang Penataan Bangunan" class="img-fluid">
             </div>
             <h6 class="fw-bold mb-2" style="color:#001f54;">Bidang Penataan Bangunan</h6>
           </div>
@@ -760,7 +768,7 @@ session_start();
         <div class="col-6 col-md-4 col-lg-3 bidang-item">
           <div class="card border-0 shadow-sm text-center p-3 h-100">
             <div class="mx-auto mb-3" style="width:100px; height:100px; border-radius:50%; overflow:hidden;">
-              <img src="assets/konstruksi.png" alt="Bidang Pengendalian Jasa Konstruksi" class="img-fluid">
+              <img src="<?= asset_url('konstruksi.png') ?>" alt="Bidang Pengendalian Jasa Konstruksi" class="img-fluid">
             </div>
             <h6 class="fw-bold mb-2" style="color:#001f54;">Bidang Pengendalian & Pembinaan Jasa Konstruksi</h6>
           </div>
@@ -768,7 +776,7 @@ session_start();
         <div class="col-6 col-md-4 col-lg-3 bidang-item">
           <div class="card border-0 shadow-sm text-center p-3 h-100">
             <div class="mx-auto mb-3" style="width:100px; height:100px; border-radius:50%; overflow:hidden;">
-              <img src="assets/perumahan.png" alt="Bidang Perumahan dan Kawasan Permukiman" class="img-fluid">
+              <img src="<?= asset_url('perumahan.png') ?>" alt="Bidang Perumahan dan Kawasan Permukiman" class="img-fluid">
             </div>
             <h6 class="fw-bold mb-2" style="color:#001f54;">Bidang Perumahan & Kawasan Permukiman</h6>
           </div>
@@ -776,7 +784,7 @@ session_start();
         <div class="col-6 col-md-4 col-lg-3 bidang-item">
           <div class="card border-0 shadow-sm text-center p-3 h-100">
             <div class="mx-auto mb-3" style="width:100px; height:100px; border-radius:50%; overflow:hidden;">
-              <img src="assets/jalan_jembatan.png" alt="Bidang Jalan dan Jembatan" class="img-fluid">
+              <img src="<?= asset_url('jalan_jembatan.png') ?>" alt="Bidang Jalan dan Jembatan" class="img-fluid">
             </div>
             <h6 class="fw-bold mb-2" style="color:#001f54;">Bidang Jalan & Jembatan</h6>
           </div>
@@ -784,7 +792,7 @@ session_start();
         <div class="col-6 col-md-4 col-lg-3 bidang-item" style="display: none;">
           <div class="card border-0 shadow-sm text-center p-3 h-100">
             <div class="mx-auto mb-3" style="width:100px; height:100px; border-radius:50%; overflow:hidden;">
-              <img src="assets/drainase.png" alt="Bidang SDA dan Drainase" class="img-fluid">
+              <img src="<?= asset_url('drainase.png') ?>" alt="Bidang SDA dan Drainase" class="img-fluid">
             </div>
             <h6 class="fw-bold mb-2" style="color:#001f54;">Bidang Sumber Daya Air & Drainase</h6>
           </div>
@@ -792,7 +800,7 @@ session_start();
         <div class="col-6 col-md-4 col-lg-3 bidang-item" style="display: none;">
           <div class="card border-0 shadow-sm text-center p-3 h-100">
             <div class="mx-auto mb-3" style="width:100px; height:100px; border-radius:50%; overflow:hidden;">
-              <img src="assets/pal.png" alt="UPT Pengelolaan Air Limbah" class="img-fluid">
+              <img src="<?= asset_url('pal.png') ?>" alt="UPT Pengelolaan Air Limbah" class="img-fluid">
             </div>
             <h6 class="fw-bold mb-2" style="color:#001f54;">UPT Pengelolaan Air Limbah</h6>
           </div>
@@ -800,7 +808,7 @@ session_start();
         <div class="col-6 col-md-4 col-lg-3 bidang-item" style="display: none;">
           <div class="card border-0 shadow-sm text-center p-3 h-100">
             <div class="mx-auto mb-3" style="width:100px; height:100px; border-radius:50%; overflow:hidden;">
-              <img src="assets/rusunawa.png" alt="UPT Pengelolaan Rusunawa" class="img-fluid">
+              <img src="<?= asset_url('rusunawa.png') ?>" alt="UPT Pengelolaan Rusunawa" class="img-fluid">
             </div>
             <h6 class="fw-bold mb-2" style="color:#001f54;">UPT Pengelolaan Rusunawa</h6>
           </div>
@@ -808,7 +816,7 @@ session_start();
         <div class="col-6 col-md-4 col-lg-3 bidang-item" style="display: none;">
           <div class="card border-0 shadow-sm text-center p-3 h-100">
             <div class="mx-auto mb-3" style="width:100px; height:100px; border-radius:50%; overflow:hidden;">
-              <img src="assets/pju.png" alt="UPT Penerangan Jalan Umum" class="img-fluid">
+              <img src="<?= asset_url('pju.png') ?>" alt="UPT Penerangan Jalan Umum" class="img-fluid">
             </div>
             <h6 class="fw-bold mb-2" style="color:#001f54;">UPT Penerangan Jalan Umum</h6>
           </div>
@@ -830,7 +838,7 @@ session_start();
         <a href="https://lintas.geo-ai.id/" target="_blank" class="text-decoration-none" style="width:100%; max-width:280px;">
           <div class="card shadow-sm border-0 p-3 rounded-4 card-hover" style="height: 320px;">
             <div class="text-center mb-3">
-              <img src="assets/lintas.png"
+              <img src="<?= asset_url('lintas.png') ?>"
                 alt="Logo Lintas"
                 style="width:60px; height:60px; object-fit:contain;">
             </div>
@@ -852,7 +860,7 @@ session_start();
         <a href="https://pu.jogjakota.go.id/" target="_blank" class="text-decoration-none" style="width:100%; max-width:280px;">
           <div class="card shadow-sm border-0 p-3 rounded-4 card-hover" style="height: 320px;">
             <div class="text-center mb-3">
-              <img src="assets/logo.png"
+              <<img src="<?= asset_url('logo.png') ?>"
                 alt="Logo DPUPKP"
                 style="width:60px; height:60px; object-fit:contain;">
             </div>
@@ -873,7 +881,7 @@ session_start();
         <a href="https://yogyapsu.vercel.app/" target="_blank" class="text-decoration-none" style="width:100%; max-width:280px;">
           <div class="card shadow-sm border-0 p-3 rounded-4 card-hover" style="height: 320px;">
             <div class="text-center mb-3">
-              <img src="assets/yogyapsu.png"
+              <img src="<?= asset_url('yogyapsu.png') ?>"
                 alt="Logo Yogyapsu"
                 style="width:60px; height:60px; object-fit:contain;">
             </div>
@@ -911,35 +919,35 @@ session_start();
       <div class="data-items" style="display:flex; justify-content:center; gap:40px; flex-wrap:wrap; text-align:center; margin-top:20px;">
         <div class="item" style="flex:1; min-width:150px;">
           <div class="icon" style="background: #fffef0ff; color:var(--biru-pupr); font-size:30px; width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; box-shadow:0 3px 6px rgba(0,0,0,0.15); transition:transform 0.3s;">
-            <img src="assets/luas.png" alt="luas" class="img-fluid">
+            <img src="<?= asset_url('luas.png') ?>" alt="luas" class="img-fluid">
           </div>
           <h3 class="counter" data-target="32.82">0</h3>
           <p>Luas Wilayah (km²)</p>
         </div>
         <div class="item" style="flex:1; min-width:150px;">
           <div class="icon" style="background: #fffef0ff; color:var(--biru-pupr); font-size:30px; width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; box-shadow:0 3px 6px rgba(0,0,0,0.15); transition:transform 0.3s;">
-            <img src="assets/kecamatan.png" alt="luas" class="img-fluid">
+            <img src="<?= asset_url('kecamatan.png') ?>" alt="luas" class="img-fluid">
           </div>
           <h3 class="counter" data-target="14">0</h3>
           <p>Kemantren</p>
         </div>
         <div class="item" style="flex:1; min-width:150px;">
           <div class="icon" style="background: #fffef0ff; color:var(--biru-pupr); font-size:30px; width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; box-shadow:0 3px 6px rgba(0,0,0,0.15); transition:transform 0.3s;">
-            <img src="assets/kelurahan.png" alt="luas" class="img-fluid">
+            <img src="<?= asset_url('kelurahan.png') ?>" alt="luas" class="img-fluid">
           </div>
           <h3 class="counter" data-target="45">0</h3>
           <p>Kelurahan</p>
         </div>
         <div class="item" style="flex:1; min-width:150px;">
           <div class="icon" style="background: #fffef0ff; color:var(--biru-pupr); font-size:30px; width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; box-shadow:0 3px 6px rgba(0,0,0,0.15); transition:transform 0.3s;">
-            <img src="assets/rw.png" alt="luas" class="img-fluid">
+            <img src="<?= asset_url('rw.png') ?>" alt="luas" class="img-fluid">
           </div>
           <h3 class="counter" data-target="616">0</h3>
           <p>RW</p>
         </div>
         <div class="item" style="flex:1; min-width:150px;">
           <div class="icon" style="background: #fffef0ff; color:var(--biru-pupr); font-size:30px; width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; box-shadow:0 3px 6px rgba(0,0,0,0.15); transition:transform 0.3s;">
-            <img src="assets/rt.png" alt="luas" class="img-fluid">
+            <img src="<?= asset_url('rt.png') ?>" alt="luas" class="img-fluid">
           </div>
           <h3 class="counter" data-target="2535">0</h3>
           <p>RT</p>
