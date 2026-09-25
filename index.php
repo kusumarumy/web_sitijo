@@ -1,5 +1,10 @@
 <?php
 session_start();
+
+function asset_url($file)
+{
+    return '/' . ltrim($file, '/');
+}
 ?>
 
 <!DOCTYPE html>
