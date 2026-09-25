@@ -596,7 +596,6 @@ function asset_url($file)
   <?php
   include $_SERVER['DOCUMENT_ROOT'] . "/partials/header.php";
   include $_SERVER['DOCUMENT_ROOT'] . "/partials/sidebar.php";
-  echo "<h1 style='color:red; margin:100px;'>INDEX PHP BERHASIL</h1>";
   ?>
   <div class="main">
     <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
