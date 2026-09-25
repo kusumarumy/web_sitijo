@@ -1,6 +1,19 @@
 <?php
 session_start();
 
+$R2_ASSET_URL = getenv('R2_ASSET_URL');
+
+function asset_url($file)
+{
+  global $R2_ASSET_URL;
+
+  if (!empty($R2_ASSET_URL)) {
+    return rtrim($R2_ASSET_URL, '/') . '/' . ltrim($file, '/');
+  }
+
+  return '/' . ltrim($file, '/');
+}
+
 if (isset($_SESSION['user'])) {
   $redirect = isset($_GET['redirect']) ? $_GET['redirect'] : '/index.php';
   header("Location: " . htmlspecialchars($redirect));
