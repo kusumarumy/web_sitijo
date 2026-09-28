@@ -888,32 +888,6 @@ Promise.all(
   );
 
   loadUtilitas(utilitasData);
-})
-
-.catch(err => {
-  console.error(
-    "Gagal ambil data utilitas:",
-    err
-  );
-
-  const loading = document.querySelector(
-    "#loadingOverlay"
-  );
-
-  if (loading) {
-    const title = loading.querySelector("h2");
-    const message = loading.querySelector("p");
-
-    if (title) {
-      title.innerText = "Gagal memuat data!";
-    }
-
-    if (message) {
-      message.innerText =
-        "Periksa endpoint utilitas pada server.";
-    }
-  }
-});
 
         //ATRIBUT JALAN
         // 1.Cermin Jalan
@@ -2245,31 +2219,54 @@ Promise.all(
             layerUtilitas["sungai"]["sungai"] = layer;
           }
         }
-        document.getElementById("loadingOverlay").style.display = "none";
+document.getElementById("loadingOverlay").style.display = "none";
 
-        document.querySelectorAll("#layerTree input[type=checkbox]").forEach(cb => {
-          cb.disabled = false;
-          cb.addEventListener("change", () => {
-            const sub = cb.dataset.layer;
-            for (const cls in layerUtilitas) {
-              if (layerUtilitas[cls][sub]) {
-                if (cb.checked) {
-                  map.addLayer(layerUtilitas[cls][sub]);
-                } else {
-                  map.removeLayer(layerUtilitas[cls][sub]);
-                }
-              }
-            }
-            updateLegend();
-          });
-        });
-        document.getElementById("loadingOverlay").style.display = "none";
-      )
-      .catch(err => {
-        console.error("Gagal ambil data utilitas:", err);
-        document.querySelector("#loadingOverlay h2").innerText = "Gagal memuat data!";
-        document.querySelector("#loadingOverlay p").innerText = "Silakan refresh halaman.";
-      });
+document.querySelectorAll("#layerTree input[type=checkbox]").forEach(cb => {
+  cb.disabled = false;
+
+  cb.addEventListener("change", () => {
+    const sub = cb.dataset.layer;
+
+    for (const cls in layerUtilitas) {
+      if (layerUtilitas[cls][sub]) {
+        if (cb.checked) {
+          map.addLayer(layerUtilitas[cls][sub]);
+        } else {
+          map.removeLayer(layerUtilitas[cls][sub]);
+        }
+      }
+    }
+
+    updateLegend();
+  });
+});
+
+// TUTUP .then() DI SINI
+})
+.catch(err => {
+  console.error(
+    "Gagal ambil data utilitas:",
+    err
+  );
+
+  const loading = document.querySelector(
+    "#loadingOverlay"
+  );
+
+  if (loading) {
+    const title = loading.querySelector("h2");
+    const message = loading.querySelector("p");
+
+    if (title) {
+      title.innerText = "Gagal memuat data!";
+    }
+
+    if (message) {
+      message.innerText =
+        "Periksa endpoint utilitas pada server.";
+    }
+  }
+});
   </script>
 </body>
 
