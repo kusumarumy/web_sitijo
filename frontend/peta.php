@@ -1477,7 +1477,7 @@ Promise.all(
           `);
             }
           });
-          if (!layerUtilitas["kabel_fiber_optik"]) layerUtilitas["kabekabel_fiber_optikl_fo"] = {};
+          if (!layerUtilitas["kabel_fiber_optik"]) {layerUtilitas["kabel_fiber_optik"] = {};}
           layerUtilitas["kabel_fiber_optik"]["kabel_fiber_optik"] = layer;
         }
         // 2.Manhole Fiber Optik
