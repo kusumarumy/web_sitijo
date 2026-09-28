@@ -3,6 +3,20 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('memory_limit','1024M');
 error_reporting(E_ALL);
+session_start();
+
+$R2_ASSET_URL = getenv('R2_ASSET_URL');
+
+function asset_url($file)
+{
+    global $R2_ASSET_URL;
+
+    if (!empty($R2_ASSET_URL)) {
+        return rtrim($R2_ASSET_URL, '/') . '/assets/' . ltrim($file, '/');
+    }
+
+    return '/assets/' . ltrim($file, '/');
+}
 ?>
 
 <!DOCTYPE html>
