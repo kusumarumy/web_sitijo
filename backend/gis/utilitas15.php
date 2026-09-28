@@ -23,7 +23,14 @@ function normalizeKey($str)
 
 function getStyles()
 {
-    $basePath = "/assets";
+    $R2_ASSET_URL = getenv('R2_ASSET_URL');
+
+    if (!empty($R2_ASSET_URL)) {
+        $basePath = rtrim($R2_ASSET_URL, '/') . '/assets';
+    } else {
+        $basePath = '/assets';
+    }
+
     return [
         "jaringan_jalan" => [
             "trotoar" => ["type" => "polygon", "color" => "grey"],
