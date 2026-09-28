@@ -52,7 +52,7 @@ function getUtilitas($conn, $table, $fields, $kelas)
     $result = $conn->query($sql);
     $features = [];
     if ($result) {
-        while ($row = $result->fetch_assoc()) {
+        $result->fetch(PDO::FETCH_ASSOC)
             $subkelas = strtolower(trim($row['subkelas'] ?? 'lainnya'));
             $style = getStyle($kelas, $subkelas);
 
