@@ -810,7 +810,7 @@ function asset_url($file)
       }
       return marker;
     }
-
+/*
     Promise.all([
         fetch("../backend/gis/utilitas1.php").then(r => r.json()),
         fetch("../backend/gis/utilitas2.php").then(r => r.json()),
@@ -828,7 +828,66 @@ function asset_url($file)
         fetch("../backend/gis/utilitas14.php").then(r => r.json()),
         fetch("../backend/gis/utilitas15.php").then(r => r.json())
       ])
-      
+      */
+      const utilitasFiles = Array.from(
+  { length: 15 },
+  (_, i) => `../backend/gis/utilitas${i + 1}.php`
+);
+
+Promise.all(
+  utilitasFiles.map(async (url) => {
+    const response = await fetch(url);
+    const text = await response.text();
+
+    console.log(
+      `[UTILITAS] ${url} | HTTP ${response.status}`,
+      text.substring(0, 500)
+    );
+
+    if (!response.ok) {
+      throw new Error(`${url} mengembalikan HTTP ${response.status}`);
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch (error) {
+      console.error(`❌ BUKAN JSON: ${url}`);
+      console.error(text);
+      throw new Error(`${url} tidak mengembalikan JSON`);
+    }
+  })
+)
+
+.then(allData => {
+    const utilitasData = {};
+
+    for (const data of allData) {
+        for (const [key, fc] of Object.entries(data)) {
+            if (utilitasData[key] && fc?.type === "FeatureCollection") {
+                utilitasData[key].features.push(...fc.features);
+            } else {
+                utilitasData[key] = fc;
+            }
+        }
+    }
+
+    console.log("DATA UTILITAS GABUNGAN:", utilitasData);
+    loadUtilitas(utilitasData);
+
+    // lanjutkan kode kamu yang sekarang...
+})
+
+.catch(err => {
+    console.error("Gagal ambil data utilitas:", err);
+
+    const loading = document.querySelector("#loadingOverlay");
+
+    if (loading) {
+        loading.querySelector("h2").innerText = "Gagal memuat data!";
+        loading.querySelector("p").innerText =
+            "Periksa endpoint utilitas pada server.";
+    }
+});
         .then(allData => {
   const utilitasData = {};
 
