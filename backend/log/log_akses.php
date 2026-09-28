@@ -46,8 +46,14 @@ function logAkses($conn, $user= null, $menu = null, $aksi = null, $keterangan = 
     $ip = $_SERVER['REMOTE_ADDR'] ?? '';
     $agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
-    $stmt->bind_param("sssssss", $username, $unit, $menu, $aksi, $keterangan, $ip, $agent);
-    $stmt->execute();
-    $stmt->close();
+$stmt->execute([
+    ':username'   => $username,
+    ':unit'       => $unit,
+    ':menu'       => $menu,
+    ':aksi'       => $aksi,
+    ':keterangan' => $keterangan,
+    ':ip_address' => $ip,
+    ':user_agent' => $agent
+]);
 }
 ?>
