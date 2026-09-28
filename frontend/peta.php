@@ -2264,7 +2264,7 @@ Promise.all(
           });
         });
         document.getElementById("loadingOverlay").style.display = "none";
-      })
+      )
       .catch(err => {
         console.error("Gagal ambil data utilitas:", err);
         document.querySelector("#loadingOverlay h2").innerText = "Gagal memuat data!";
