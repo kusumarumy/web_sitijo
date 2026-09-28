@@ -1052,9 +1052,9 @@ Promise.all(
                 });
               }
               return L.circleMarker(latlng, {
-                radius: 5,
-                color: feature.style?.color || "#444"
-              });
+              radius: 5,
+              color: (feature.style && feature.style.color) || "#444"
+            });
             },
             onEachFeature: (feature, layer) => {
               let props = feature.properties;
