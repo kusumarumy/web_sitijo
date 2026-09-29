@@ -5,9 +5,14 @@ error_reporting(E_ALL);
 ini_set('memory_limit', '1024M');
 session_start();   
 require_once "../../backend/db/koneksi.php";
+
+// log_akses.php dapat menghasilkan output. Tangkap dan buang output-nya
+// agar header download tetap dapat dikirim oleh PHP.
+ob_start();
 include __DIR__ . '/../log/log_akses.php';
 $user = $_SESSION['user'] ?? ['username'=>'guest', 'unit'=>'guest'];
 logAkses($conn, $user, "download_data.php", "Mengunduh data infrastruktur.");
+ob_end_clean();
 
 $mapSubkelasToTable = [
     "cermin jalan" => "cermin_jalan",
@@ -47,77 +52,141 @@ $mapSubkelasToTable = [
 ];
 if (isset($_GET['download']) && isset($_GET['subkelas'])) {
     $subkelas = strtolower(trim($_GET['subkelas']));
+
     if (!isset($mapSubkelasToTable[$subkelas])) {
+        http_response_code(400);
         die("❌ Subkelas tidak ditemukan dalam mapping.");
     }
+
     $table = $mapSubkelasToTable[$subkelas];
 
-    // PostgreSQL: cek keberadaan tabel melalui information_schema.
-    $check = $conn->prepare("
-        SELECT EXISTS (
-            SELECT 1
-            FROM information_schema.tables
-            WHERE table_schema = 'public'
-              AND table_name = :table
-        )
-    ");
-    $check->execute([':table' => $table]);
+    try {
+        // PostgreSQL: cek keberadaan tabel melalui information_schema.
+        $check = $conn->prepare("
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                  AND table_name = :table
+            )
+        ");
+        $check->execute([':table' => $table]);
 
-    if (!$check->fetchColumn()) {
-        die("❌ Tabel tidak ditemukan: " . htmlspecialchars($table, ENT_QUOTES, 'UTF-8'));
-    }
+        if (!$check->fetchColumn()) {
+            http_response_code(404);
+            die("❌ Tabel tidak ditemukan: " . htmlspecialchars($table, ENT_QUOTES, 'UTF-8'));
+        }
 
-    // Ambil data dan konversi geometri PostGIS menjadi GeoJSON.
-    $sql = 'SELECT *, ST_AsGeoJSON("geometri") AS geojson FROM "' . $table . '"';
-    $result = $conn->query($sql);
+        // Nama tabel berasal dari whitelist mapping di atas.
+        // PostgreSQL menggunakan double quote untuk identifier.
+        $sql = 'SELECT *, ST_AsGeoJSON("geometri") AS geojson FROM "' . $table . '"';
+        $result = $conn->query($sql);
 
-    // PDO menggunakan fetch(), bukan num_rows/fetch_assoc milik mysqli.
-    $firstRow = $result->fetch(PDO::FETCH_ASSOC);
-    if ($firstRow === false) {
-        die("❌ Tidak ada data untuk subkelas: " . htmlspecialchars($subkelas, ENT_QUOTES, 'UTF-8'));
-    }
-    while (ob_get_level()) {
-        ob_end_clean();
-    }
-    $tmpFile = __DIR__ . "/temp_" . uniqid() . ".geojson";
-    $handle = fopen($tmpFile, 'w');
-    fwrite($handle, '{"type":"FeatureCollection","features":[');
-    $first = true;
-    // Proses baris pertama yang sudah diambil, kemudian lanjutkan dengan PDO.
-    $rows = [$firstRow];
-    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        $rows[] = $row;
-    }
+        $firstRow = $result->fetch(PDO::FETCH_ASSOC);
 
-    foreach ($rows as $row) {
-        if (empty($row["geojson"])) continue;
-        $geometry = json_decode($row["geojson"], true);
-        if ($geometry === null && json_last_error() !== JSON_ERROR_NONE) continue;
-        unset($row["geojson"], $row["geometri"]);
-        $feature = [
-            "type" => "Feature",
-            "geometry" => $geometry,
-            "properties" => $row
-        ];
-        if (!$first) fwrite($handle, ',');
-        fwrite($handle, json_encode($feature, JSON_UNESCAPED_UNICODE));
-        $first = false;
+        if ($firstRow === false) {
+            http_response_code(404);
+            die("❌ Tidak ada data untuk subkelas: " .
+                htmlspecialchars($subkelas, ENT_QUOTES, 'UTF-8'));
+        }
+
+        // Buat file GeoJSON sementara.
+        $tmpFile = __DIR__ . "/temp_" . uniqid('', true) . ".geojson";
+        $handle = fopen($tmpFile, 'wb');
+
+        if ($handle === false) {
+            throw new RuntimeException("Tidak dapat membuat file sementara.");
+        }
+
+        fwrite($handle, '{"type":"FeatureCollection","features":[');
+        $first = true;
+
+        $processRow = function (array $row) use ($handle, &$first): void {
+            if (empty($row['geojson'])) {
+                return;
+            }
+
+            $geometry = json_decode($row['geojson'], true);
+
+            if ($geometry === null && json_last_error() !== JSON_ERROR_NONE) {
+                return;
+            }
+
+            unset($row['geojson'], $row['geometri']);
+
+            $feature = [
+                'type' => 'Feature',
+                'geometry' => $geometry,
+                'properties' => $row
+            ];
+
+            if (!$first) {
+                fwrite($handle, ',');
+            }
+
+            fwrite(
+                $handle,
+                json_encode(
+                    $feature,
+                    JSON_UNESCAPED_UNICODE |
+                    JSON_UNESCAPED_SLASHES |
+                    JSON_INVALID_UTF8_SUBSTITUTE
+                )
+            );
+
+            $first = false;
+        };
+
+        // Proses baris pertama.
+        $processRow($firstRow);
+
+        // Proses seluruh baris berikutnya menggunakan PDO.
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $processRow($row);
+        }
+
+        fwrite($handle, ']}');
+        fclose($handle);
+
+        // Bersihkan seluruh output dari include/log sebelum mengirim header.
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        clearstatcache(true, $tmpFile);
+        $fileSize = filesize($tmpFile);
+
+        header('Content-Type: application/geo+json; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $subkelas . '.geojson"');
+        header('Content-Transfer-Encoding: binary');
+        header('Content-Length: ' . $fileSize);
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: public');
+        header('Expires: 0');
+
+        $fp = fopen($tmpFile, 'rb');
+
+        if ($fp !== false) {
+            fpassthru($fp);
+            fclose($fp);
+        }
+
+        unlink($tmpFile);
+        exit;
+
+    } catch (Throwable $e) {
+        if (isset($tmpFile) && is_file($tmpFile)) {
+            @unlink($tmpFile);
+        }
+
+        error_log('Download GeoJSON error: ' . $e->getMessage());
+
+        if (!headers_sent()) {
+            http_response_code(500);
+        }
+
+        die("❌ Gagal membuat download GeoJSON. Silakan cek log server.");
     }
-    fwrite($handle, ']}');
-    fclose($handle);
-    header("Content-Type: application/geo+json");
-    header("Content-Disposition: attachment; filename=\"$subkelas.geojson\"");
-    header("Content-Transfer-Encoding: binary");
-    header("Cache-Control: no-cache");
-    header("Pragma: public");
-    $fp = fopen($tmpFile, 'rb');
-    while (!feof($fp)) {
-        echo fread($fp, 8192);
-        flush();
-    }
-    fclose($fp);
-    unlink($tmpFile);
-    exit;
 }
 ?>
 <!DOCTYPE html>
