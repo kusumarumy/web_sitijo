@@ -156,8 +156,6 @@ if ($kelas && $subkelas && isset($kelas_subkelas[$kelas]) && in_array($subkelas,
     }
 }
 
-}
-
 function detectIdField($fields)
 {
     foreach ($fields as $f) {
