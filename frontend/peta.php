@@ -406,7 +406,7 @@ function asset_url($file)
     L.Control.Compass = L.Control.extend({
       onAdd: function(map) {
         let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-compass');
-        container.innerHTML = `<img src="../assets/kompas.png" alt="Kompas">`;
+        container.innerHTML = `<img src="<?= asset_url('kompas.png') ?>">`;
         return container;
       }
     });
