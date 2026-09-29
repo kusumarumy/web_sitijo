@@ -109,12 +109,11 @@ if ($kelas && $subkelas && isset($kelas_subkelas[$kelas]) && in_array($subkelas,
     // PostgreSQL menggunakan double quote untuk nama tabel, bukan backtick.
     $sql = 'SELECT *, ST_AsGeoJSON(geometri) AS geojson FROM "' . $subkelas . '"';
 
-    // PostgreSQL
-    $result = pg_query($conn, $sql);
+    // Koneksi aplikasi menggunakan PDO PostgreSQL.
+    try {
+        $stmt = $conn->query($sql);
 
-    if ($result !== false) {
-
-        while ($row = pg_fetch_assoc($result)) {
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $row;
         }
 
@@ -128,13 +127,10 @@ if ($kelas && $subkelas && isset($kelas_subkelas[$kelas]) && in_array($subkelas,
         );
 
         foreach ($data as $row) {
-
             if (!empty($row['geojson'])) {
-
                 $geometry = json_decode($row['geojson'], true);
 
                 if ($geometry) {
-
                     $geojsonFeatures[] = [
                         "type" => "Feature",
                         "geometry" => $geometry,
@@ -149,18 +145,17 @@ if ($kelas && $subkelas && isset($kelas_subkelas[$kelas]) && in_array($subkelas,
                             ARRAY_FILTER_USE_KEY
                         )
                     ];
-
                 }
             }
         }
 
-    } else {
-
+    } catch (PDOException $e) {
         error_log(
-            "PostgreSQL query error: " . pg_last_error($conn)
+            "PostgreSQL query error: " . $e->getMessage()
         );
-
     }
+}
+
 }
 
 function detectIdField($fields)
