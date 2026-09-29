@@ -121,6 +121,10 @@ require_once dirname(__DIR__) . '/partials/helpers.php';
     <?php include dirname(__DIR__) . "/partials/sidebar.php"; ?>
 <?php
 $pdfPanduan = asset_url('Panduan WEBGIS SITIJO.pdf');
+
+echo '<pre>';
+echo 'PDF URL: ' . htmlspecialchars($pdfPanduan);
+echo '</pre>';
 ?>
     <div class="main-container">
         <div class="card">
