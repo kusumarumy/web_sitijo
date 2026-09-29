@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once dirname(__DIR__) . '/helper.php';
 ?>
 
 <!DOCTYPE html>
@@ -125,12 +126,22 @@ session_start();
            <iframe src="https://drive.google.com/file/d/13STCML0QjTnBF-4mq1PibAbgCy0wLoYz/preview" allow="autoplay" allowfullscreen></iframe>
         </div>
         <div class="card">
-            <h4>📄 Panduan Penggunaan WEBGIS</h4>
-            <embed class="pdf-box" src="/assets/Panduan WEBGIS SITIJO.pdf" type="application/pdf">
-            <a href="/assets/Panduan WEBGIS SITIJO.pdf" download class="download-btn">
-                <i class="bi bi-download"></i> Download Panduan PDF
-            </a>
-        </div>
+    <h4>📄 Panduan Penggunaan WEBGIS</h4>
+
+    <embed
+        class="pdf-box"
+        src="<?= htmlspecialchars(asset_url('Panduan WEBGIS SITIJO.pdf')) ?>"
+        type="application/pdf"
+    >
+
+    <a
+        href="<?= htmlspecialchars(asset_url('Panduan WEBGIS SITIJO.pdf')) ?>"
+        target="_blank"
+        class="download-btn"
+    >
+        <i class="bi bi-download"></i> Download Panduan PDF
+    </a>
+</div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
