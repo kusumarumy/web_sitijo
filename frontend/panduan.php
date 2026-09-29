@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once dirname(__DIR__) . '/partials/helper.php';
+require_once dirname(__DIR__) . '/partials/helpers.php';
 ?>
 
 <!DOCTYPE html>
