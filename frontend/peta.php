@@ -826,7 +826,8 @@ function asset_url($file)
         fetch("../backend/gis/utilitas12.php").then(r => r.json()),
         fetch("../backend/gis/utilitas13.php").then(r => r.json()),
         fetch("../backend/gis/utilitas14.php").then(r => r.json()),
-        fetch("../backend/gis/utilitas15.php").then(r => r.json())
+        fetch("../backend/gis/utilitas15.php").then(r => r.json()),
+        fetch("../backend/gis/utilitas16.php").then(r => r.json())
       ])
       */
 
