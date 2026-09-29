@@ -1,15 +1,48 @@
 <?php
+
 include '../../backend/db/koneksi.php';
 include '../../backend/auth/cek_role.php';
 include __DIR__ . '/../log/log_akses.php';
-logAkses($conn, $_SESSION['user'], "update_proses.php", "Mengubah Atribut Data");
 
+/*
+|--------------------------------------------------------------------------
+| Helper untuk quote identifier PostgreSQL
+|--------------------------------------------------------------------------
+*/
+function quoteIdentifier($name)
+{
+    return '"' . str_replace('"', '""', $name) . '"';
+}
+
+/*
+|--------------------------------------------------------------------------
+| Ambil user session
+|--------------------------------------------------------------------------
+*/
+if (!isset($user) || !is_array($user)) {
+    $user = $_SESSION['user'] ?? [
+        'username' => 'unknown',
+        'unit' => 'guest'
+    ];
+}
+
+/*
+|--------------------------------------------------------------------------
+| Ambil parameter
+|--------------------------------------------------------------------------
+*/
 $subkelas = $_POST['subkelas'] ?? $_GET['subkelas'] ?? '';
-$data_id = $_GET['id'] ?? $_POST['id'] ?? '';
-$subkelas = trim($subkelas);
-$data_id = trim($data_id);
-$id = $data_id;
+$data_id  = $_GET['id'] ?? $_POST['id'] ?? '';
 
+$subkelas = trim($subkelas);
+$data_id  = trim((string)$data_id);
+$id       = $data_id;
+
+/*
+|--------------------------------------------------------------------------
+| Mapping nama subkelas
+|--------------------------------------------------------------------------
+*/
 $subkelas_map = [
     "Rambu Lalu Lintas" => "rambu_lalin",
     "Rantai Pasok" => "rantai_pasok",
@@ -46,18 +79,18 @@ $subkelas_map = [
     "Reklame" => "reklame",
     "Titik Bench Mark" => "titik_bm",
 ];
+
 if (array_key_exists($subkelas, $subkelas_map)) {
     $subkelas = $subkelas_map[$subkelas];
 } else {
     $subkelas = strtolower(str_replace(' ', '_', $subkelas));
 }
 
-if (!isset($user) || !is_array($user)) {
-    $user = $_SESSION['user'] ?? ['username' => 'unknown', 'unit' => 'guest'];
-}
-
-$keterangan = "Mengubah data ID $data_id di $subkelas";
-logAkses($conn, $user['username'], $user['unit'], $subkelas, "Update", $keterangan);
+/*
+|--------------------------------------------------------------------------
+| Daftar subkelas yang diizinkan
+|--------------------------------------------------------------------------
+*/
 $subkelas_list = [
     "bangunan",
     "cermin_jalan",
@@ -95,6 +128,20 @@ $subkelas_list = [
     "trotoar",
     "zona_drainase"
 ];
+
+if (!in_array($subkelas, $subkelas_list, true)) {
+    die(
+        "<div style='text-align:center;margin-top:50px;color:red;'>
+            Subkelas tidak valid (" . htmlspecialchars($subkelas) . ").
+        </div>"
+    );
+}
+
+/*
+|--------------------------------------------------------------------------
+| Primary key masing-masing tabel
+|--------------------------------------------------------------------------
+*/
 $primary_keys = [
     "cermin_jalan" => "id",
     "kamera_pengawas" => "id",
@@ -131,43 +178,259 @@ $primary_keys = [
     "jalur_halte" => "id",
     "sungai" => "id"
 ];
-if (!in_array($subkelas, $subkelas_list, true)) {
-    die("<div style='text-align:center;margin-top:50px;color:red;'>Subkelas tidak valid ($subkelas).</div>");
-}
+
+/*
+|--------------------------------------------------------------------------
+| Tentukan primary key
+|--------------------------------------------------------------------------
+*/
+$pk = $primary_keys[$subkelas] ?? null;
 
 $pesan = '';
 $data_edit = [];
 $fields = [];
-$res = mysqli_query($conn, "SELECT * FROM `$subkelas` LIMIT 1");
-if ($res) {
-    $fields = array_keys(mysqli_fetch_assoc($res));
-} else {
-    die("Gagal mengambil struktur tabel: " . mysqli_error($conn));
-}
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
-    $pk = $_POST['pk'];
-    $id_post = $_POST['id'];
-    $set = [];
-    foreach ($_POST as $field => $val) {
-        if (in_array($field, ['update', 'id', 'pk', 'subkelas'])) continue;
-        if ($field === 'geometri') continue;
-        $val = mysqli_real_escape_string($conn, $val);
-        $set[] = "`$field` = '$val'";
-    }
-    $setStr = implode(',', $set);
-    $query = "UPDATE `$subkelas` SET $setStr WHERE `$pk` = '$id_post'";
-    if (mysqli_query($conn, $query)) {
-        $pesan = "<div class='alert alert-success mt-3'>✅ Data berhasil diperbarui.</div>";
+
+/*
+|--------------------------------------------------------------------------
+| Ambil struktur tabel
+|--------------------------------------------------------------------------
+*/
+try {
+
+    $tableQuoted = quoteIdentifier($subkelas);
+
+    $stmt = $conn->query(
+        "SELECT * FROM {$tableQuoted} LIMIT 1"
+    );
+
+    $firstRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($firstRow !== false) {
+        $fields = array_keys($firstRow);
     } else {
-        $pesan = "<div class='alert alert-danger mt-3'>❌ Gagal memperbarui data: " . mysqli_error($conn) . "</div>";
+
+        /*
+         * Kalau tabel kosong, ambil nama kolom dari PostgreSQL.
+         */
+        $stmtColumns = $conn->prepare("
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = :table_name
+            ORDER BY ordinal_position
+        ");
+
+        $stmtColumns->execute([
+            ':table_name' => $subkelas
+        ]);
+
+        $fields = $stmtColumns->fetchAll(PDO::FETCH_COLUMN);
     }
-    $id = $id_post;
+
+    if (empty($fields)) {
+        die(
+            "<div style='text-align:center;margin-top:50px;color:red;'>
+                Gagal mengambil struktur tabel {$subkelas}.
+            </div>"
+        );
+    }
+
+    /*
+     * Jika primary key belum terdaftar di mapping,
+     * gunakan kolom pertama sebagai fallback.
+     */
+    if (!$pk || !in_array($pk, $fields, true)) {
+        $pk = $fields[0];
+    }
+
+} catch (PDOException $e) {
+
+    die(
+        "<div style='text-align:center;margin-top:50px;color:red;'>
+            Gagal mengambil struktur tabel:
+            " . htmlspecialchars($e->getMessage()) . "
+        </div>"
+    );
 }
-if ($id) {
-    $pk = $primary_keys[$subkelas] ?? $fields[0];
-$q = mysqli_query($conn, "SELECT * FROM `$subkelas` WHERE `$pk` = '$id'");
-    $data_edit = mysqli_fetch_assoc($q);
+
+/*
+|--------------------------------------------------------------------------
+| PROSES UPDATE
+|--------------------------------------------------------------------------
+*/
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
+
+    $id_post = $_POST['id'] ?? '';
+
+    if ($id_post === '') {
+
+        $pesan = "
+            <div class='alert alert-danger mt-3'>
+                ❌ ID data tidak ditemukan.
+            </div>
+        ";
+
+    } else {
+
+        try {
+
+            $set = [];
+            $params = [];
+
+            /*
+             * Field yang tidak boleh di-update
+             */
+            $excludedFields = [
+                'update',
+                'id',
+                'pk',
+                'subkelas',
+                'geometri',
+                'geometry',
+                'geom'
+            ];
+
+            /*
+             * Hanya field yang benar-benar ada di tabel
+             * yang boleh dimasukkan ke UPDATE.
+             */
+            foreach ($_POST as $field => $val) {
+
+                if (in_array($field, $excludedFields, true)) {
+                    continue;
+                }
+
+                if (!in_array($field, $fields, true)) {
+                    continue;
+                }
+
+                /*
+                 * Jangan update primary key.
+                 */
+                if ($field === $pk) {
+                    continue;
+                }
+
+                $paramName = ':field_' . count($params);
+
+                $set[] =
+                    quoteIdentifier($field) .
+                    " = " .
+                    $paramName;
+
+                $params[$paramName] = $val;
+            }
+
+            /*
+             * Pastikan ada field yang akan di-update.
+             */
+            if (empty($set)) {
+
+                $pesan = "
+                    <div class='alert alert-warning mt-3'>
+                        ⚠️ Tidak ada data yang diubah.
+                    </div>
+                ";
+
+            } else {
+
+                $setStr = implode(', ', $set);
+
+                $query =
+                    "UPDATE " . quoteIdentifier($subkelas) .
+                    " SET " . $setStr .
+                    " WHERE " . quoteIdentifier($pk) . " = :primary_id";
+
+                $params[':primary_id'] = $id_post;
+
+                $stmtUpdate = $conn->prepare($query);
+                $stmtUpdate->execute($params);
+
+                if ($stmtUpdate->rowCount() >= 0) {
+
+                    $pesan = "
+                        <div class='alert alert-success mt-3'>
+                            ✅ Data berhasil diperbarui.
+                        </div>
+                    ";
+
+                }
+
+                $id = $id_post;
+            }
+
+        } catch (PDOException $e) {
+
+            $pesan = "
+                <div class='alert alert-danger mt-3'>
+                    ❌ Gagal memperbarui data:
+                    " . htmlspecialchars($e->getMessage()) . "
+                </div>
+            ";
+        }
+    }
+
+    /*
+     * Logging aktivitas update
+     */
+    try {
+
+        $keterangan =
+            "Mengubah data ID {$id_post} di {$subkelas}";
+
+        logAkses(
+            $conn,
+            $user['username'] ?? 'unknown',
+            $user['unit'] ?? 'guest',
+            $subkelas,
+            "Update",
+            $keterangan
+        );
+
+    } catch (Throwable $e) {
+
+        /*
+         * Jangan sampai kegagalan logging membuat proses update
+         * gagal.
+         */
+    }
 }
+
+/*
+|--------------------------------------------------------------------------
+| Ambil data yang akan diedit
+|--------------------------------------------------------------------------
+*/
+if ($id !== '') {
+
+    try {
+
+        $querySelect =
+            "SELECT * FROM " .
+            quoteIdentifier($subkelas) .
+            " WHERE " .
+            quoteIdentifier($pk) .
+            " = :id";
+
+        $stmtSelect = $conn->prepare($querySelect);
+
+        $stmtSelect->execute([
+            ':id' => $id
+        ]);
+
+        $data_edit = $stmtSelect->fetch(PDO::FETCH_ASSOC);
+
+    } catch (PDOException $e) {
+
+        $pesan = "
+            <div class='alert alert-danger mt-3'>
+                ❌ Gagal mengambil data:
+                " . htmlspecialchars($e->getMessage()) . "
+            </div>
+        ";
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -175,11 +438,30 @@ $q = mysqli_query($conn, "SELECT * FROM `$subkelas` WHERE `$pk` = '$id'");
 
 <head>
     <meta charset="UTF-8">
-    <title>Edit Data <?= ucfirst(str_replace('_', ' ', $subkelas)) ?></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <title>
+        Edit Data <?= htmlspecialchars(
+            ucfirst(str_replace('_', ' ', $subkelas))
+        ) ?>
+    </title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    >
+
     <style>
+
         body {
             font-family: 'Segoe UI', sans-serif;
             background-color: #f4f6f9;
@@ -239,56 +521,145 @@ $q = mysqli_query($conn, "SELECT * FROM `$subkelas` WHERE `$pk` = '$id'");
             color: #777;
             border-top: 1px solid #ddd;
         }
+
     </style>
+
 </head>
 
 <body>
+
     <?php include "../../partials/sidebar.php"; ?>
+
     <?php include "../../partials/header.php"; ?>
 
     <div class="container my-5">
+
         <div class="card p-4">
-            <h5 class="fw-semibold mb-3">Formulir Edit Data</h5>
+
+            <h5 class="fw-semibold mb-3">
+                Formulir Edit Data
+            </h5>
+
             <?= $pesan ?>
+
             <?php if ($data_edit): ?>
+
                 <form method="POST" action="">
-                    <input type="hidden" name="subkelas" value="<?= htmlspecialchars($subkelas) ?>">
-                    <input type="hidden" name="id" value="<?= htmlspecialchars($data_edit[$fields[0]]) ?>">
-                    <input type="hidden" name="pk" value="<?= $pk ?>">
+
+                    <input
+                        type="hidden"
+                        name="subkelas"
+                        value="<?= htmlspecialchars($subkelas) ?>"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="id"
+                        value="<?= htmlspecialchars($data_edit[$pk] ?? '') ?>"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="pk"
+                        value="<?= htmlspecialchars($pk) ?>"
+                    >
+
                     <div class="row">
+
                         <?php foreach ($data_edit as $field => $value): ?>
-                            <?php if ($field === 'geometri') continue; ?>
+
+                            <?php
+                            /*
+                             * Geometry tidak ditampilkan di form.
+                             */
+                            if (
+                                $field === 'geometri' ||
+                                $field === 'geometry' ||
+                                $field === 'geom'
+                            ) {
+                                continue;
+                            }
+                            ?>
+
                             <div class="col-md-6 mb-3">
-                                <label class="form-label"><?= ucfirst(str_replace('_', ' ', $field)) ?></label>
-                                <?php if (strtolower($field) === strtolower($fields[0])): ?>
-                                    <input type="text" name="<?= htmlspecialchars($field) ?>"
-                                        value="<?= htmlspecialchars($value) ?>"
-                                        class="form-control" readonly>
+
+                                <label class="form-label">
+
+                                    <?= htmlspecialchars(
+                                        ucfirst(
+                                            str_replace('_', ' ', $field)
+                                        )
+                                    ) ?>
+
+                                </label>
+
+                                <?php if ($field === $pk): ?>
+
+                                    <input
+                                        type="text"
+                                        name="<?= htmlspecialchars($field) ?>"
+                                        value="<?= htmlspecialchars((string)$value) ?>"
+                                        class="form-control"
+                                        readonly
+                                    >
+
                                 <?php else: ?>
-                                    <input type="text" name="<?= htmlspecialchars($field) ?>"
-                                        value="<?= htmlspecialchars($value) ?>"
-                                        class="form-control">
+
+                                    <input
+                                        type="text"
+                                        name="<?= htmlspecialchars($field) ?>"
+                                        value="<?= htmlspecialchars((string)$value) ?>"
+                                        class="form-control"
+                                    >
+
                                 <?php endif; ?>
+
                             </div>
+
                         <?php endforeach; ?>
+
                     </div>
+
                     <div class="text-end mt-3">
-                        <button type="submit" name="update" class="btn btn-primary px-4">
+
+                        <button
+                            type="submit"
+                            name="update"
+                            class="btn btn-primary px-4"
+                        >
                             💾 Simpan Perubahan
                         </button>
+
                     </div>
+
                 </form>
+
             <?php else: ?>
-                <div class="alert alert-warning mt-3">⚠️ Data tidak ditemukan.</div>
+
+                <div class="alert alert-warning mt-3">
+
+                    ⚠️ Data tidak ditemukan.
+
+                </div>
+
             <?php endif; ?>
+
         </div>
+
     </div>
 
     <footer>
-        © <?= date('Y') ?> Dinas Pekerjaan Umum, Perumahan, dan Kawasan Permukiman Kota Yogyakarta
+
+        © <?= date('Y') ?>
+        Dinas Pekerjaan Umum, Perumahan, dan Kawasan Permukiman
+        Kota Yogyakarta
+
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
 </body>
 
 </html>
