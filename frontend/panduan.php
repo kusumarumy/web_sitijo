@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once dirname(__DIR__) . '/helper.php';
+require_once dirname(__DIR__) . '/partials/helper.php';
 ?>
 
 <!DOCTYPE html>
@@ -130,12 +130,12 @@ require_once dirname(__DIR__) . '/helper.php';
 
     <embed
         class="pdf-box"
-        src="<?= htmlspecialchars(asset_url('Panduan WEBGIS SITIJO.pdf')) ?>"
+        src="<?= htmlspecialchars($pdfPanduan) ?>"
         type="application/pdf"
     >
 
     <a
-        href="<?= htmlspecialchars(asset_url('Panduan WEBGIS SITIJO.pdf')) ?>"
+        href="<?= htmlspecialchars($pdfPanduan) ?>"
         target="_blank"
         class="download-btn"
     >
