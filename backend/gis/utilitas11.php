@@ -55,7 +55,7 @@ function getStyle($kelas, $subkelas)
 function getUtilitas($conn, $table, $fields, $kelas)
 {
     $cols = implode(", ", $fields);
-    $sql = "SELECT $cols, ST_AsGeoJSON(geometri) AS geojson FROM $table WHERE id BETWEEN 13901 AND 19200";
+    $sql = "SELECT $cols, ST_AsGeoJSON(geometri) AS geojson FROM $table WHERE id BETWEEN 13901 AND 16550";
     $result = $conn->query($sql);
     $features = [];
     if ($result) {
