@@ -51,14 +51,30 @@ if (isset($_GET['download']) && isset($_GET['subkelas'])) {
         die("❌ Subkelas tidak ditemukan dalam mapping.");
     }
     $table = $mapSubkelasToTable[$subkelas];
-    $check = $conn->query("SHOW TABLES LIKE '$table'");
-    if ($check->num_rows == 0) {
-        die("❌ Tabel tidak ditemukan: $table");
+
+    // PostgreSQL: cek keberadaan tabel melalui information_schema.
+    $check = $conn->prepare("
+        SELECT EXISTS (
+            SELECT 1
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+              AND table_name = :table
+        )
+    ");
+    $check->execute([':table' => $table]);
+
+    if (!$check->fetchColumn()) {
+        die("❌ Tabel tidak ditemukan: " . htmlspecialchars($table, ENT_QUOTES, 'UTF-8'));
     }
-    $sql = "SELECT *, ST_AsGeoJSON(geometri) AS geojson FROM $table";
+
+    // Ambil data dan konversi geometri PostGIS menjadi GeoJSON.
+    $sql = 'SELECT *, ST_AsGeoJSON("geometri") AS geojson FROM "' . $table . '"';
     $result = $conn->query($sql);
-    if (!$result || $result->num_rows === 0) {
-        die("❌ Tidak ada data untuk subkelas: $subkelas");
+
+    // PDO menggunakan fetch(), bukan num_rows/fetch_assoc milik mysqli.
+    $firstRow = $result->fetch(PDO::FETCH_ASSOC);
+    if ($firstRow === false) {
+        die("❌ Tidak ada data untuk subkelas: " . htmlspecialchars($subkelas, ENT_QUOTES, 'UTF-8'));
     }
     while (ob_get_level()) {
         ob_end_clean();
@@ -67,9 +83,16 @@ if (isset($_GET['download']) && isset($_GET['subkelas'])) {
     $handle = fopen($tmpFile, 'w');
     fwrite($handle, '{"type":"FeatureCollection","features":[');
     $first = true;
-    while ($row = $result->fetch_assoc()) {
-        if (!$row["geojson"]) continue;
+    // Proses baris pertama yang sudah diambil, kemudian lanjutkan dengan PDO.
+    $rows = [$firstRow];
+    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        $rows[] = $row;
+    }
+
+    foreach ($rows as $row) {
+        if (empty($row["geojson"])) continue;
         $geometry = json_decode($row["geojson"], true);
+        if ($geometry === null && json_last_error() !== JSON_ERROR_NONE) continue;
         unset($row["geojson"], $row["geometri"]);
         $feature = [
             "type" => "Feature",
