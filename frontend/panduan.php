@@ -119,7 +119,9 @@ require_once dirname(__DIR__) . '/partials/helpers.php';
 <body>
     <?php include dirname(__DIR__) . "/partials/header.php"; ?>
     <?php include dirname(__DIR__) . "/partials/sidebar.php"; ?>
-
+<?php
+$pdfPanduan = asset_url('Panduan WEBGIS SITIJO.pdf');
+?>
     <div class="main-container">
         <div class="card">
             <h4>🎬 Panduan Penggunaan WEBGIS</h4>
