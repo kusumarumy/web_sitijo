@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../helpers/asset.php';
 ?>
 
 <!DOCTYPE html>
@@ -405,77 +406,77 @@ session_start();
       }
       const dataManual = {
         "Atribut Jalan": {
-          icon: "../assets/atribut_jalan.jpg",
+    icon: "<?= asset_url('atribut_jalan.jpg') ?>",
           desc: "Atribut Jalan merupakan fasilitas penunjang di sepanjang area jalan yang mencakup cermin jalan, kamera pengawas, lampu jalan, lampu lalu lintas, dan rambu lalu lintas.",
           subkelas: ["Cermin Jalan", "Kamera Pengawas", "Lampu Jalan", "Lampu Lalu Lintas", "Rambu Lalu Lintas"],
           chartData: [8.7, 8.7, 100, 26.09, 26.09],
           jumlahData: ["25 Fitur", "29 Fitur", "9290 Fitur", "517 Fitur", "1767 Fitur"],
         },
         "Bangunan": {
-          icon: "../assets/bangunan.jpg",
+    icon: "<?= asset_url('bangunan.jpg') ?>",
           desc: "Berdasarkan Peraturan Pemerintah Republik Indonesia Nomor 16 Tahun 2021 tentang Peraturan Pelaksanaan Undang-Undang Nomor 28 Tahun 2002 tentang Bangunan Gedung, bahwa bangunan gedung merupakan wujud fisik hasil pekerjaan konstruksi yang menyatu dengan tempat kedudukannya, sebagian atau seluruhnya berada di atas dan/atau di dalam tanah dan/atau di air, yang berfungsi sebagai tempat manusia melakukan kegiatannya, baik untuk hunian atau tempat tinggal, kegiatan keagamaan, kegiatan usaha, kegiatan sosial dan budaya, maupun kegiatan khusus.",
           subkelas: ["Bangunan", "Rusunawa"],
           chartData: [33.33, 0],
           jumlahData: ["Fitur Bangunan Tahap 1", "0"],
         },
         "Halte": {
-          icon: "../assets/halte.jpg",
+    icon: "<?= asset_url('halte.jpg') ?>",
           desc: "Berdasarkan Peraturan Menteri Perhubungan Republik Indonesia Nomor PM 15 Tahun 2019 tentang Penyelenggaraan Angkutan Orang dengan Kendaraan Bermotor Umum dalam Trayek, bahwa halte adalah tempat persinggahan atau rambu pemberhentian angkatan umum yang dilalui oleh setiap trayek yang melayani angkutan secara terus menerus serta berhenti pada tempat untuk menaikkan dan menurunkan penumpang yang telah ditetapkan untuk angkutan perkotaan.",
           subkelas: ["Titik Halte", "Jalur Halte Trans"],
           chartData: [100, 100],
           jumlahData: ["180 Fitur", "280 km"],
         },
         "Infrastruktur Pendukung": {
-          icon: "../assets/utilitas_pendukung.jpg",
+    icon: "<?= asset_url('utilitas_pendukung.jpg') ?>",
           desc: "Infrastruktur Pendukung merupakan fasilitas penunjang infrastruktur yang mencakup hidran, rantai pasok, reklame, dan titik bench mark.",
           subkelas: ["Hidran", "Rantai Pasok", "Reklame", "Titik Bench Mark"],
           chartData: [8.70, 100, 26.09, 26.09],
           jumlahData: ["6 Fitur", "183 Fitur", "294 Fitur", "70 Fitur"],
         },
         "Jaringan Drainase": {
-          icon: "../assets/jaringan_drainase.png",
+    icon: "<?= asset_url('jaringan_drainase.png') ?>",
           desc: "Berdasarkan Peraturan Menteri Pekerjaan Umum dan Perumahan Rakyat Republik Indonesia Nomor 12/PRT/M/2014 tentang Penyelenggaraan Sistem Drainase Perkotaan, bahwa sistem drainase perkotaan adalah satu kesatuan sistem teknis dan non teknis dari prasarana dan sarana drainase perkotaan. Prasarana drainase adalah lengkungan atau saluran air di permukaan atau di bawah tanah, baik yang terbentuk secara alami maupun dibuat oleh manusia, yang berfungsi menyalurka kelebihan air dari suatu kawasan ke badan air penerima. Sedangkan sarana drainase adalah banguna pelengkap yang merupakan bangunan yang ikut mengatur dan mengena=dalikan sistem aliran air hujan agar aman dan mudah melewati jalan, belokan daerah curam seperti gorong-gorong, pertemuan saluran, bangunan terjunan, jembatan, tali-tali air, pompa dan pintu air.",
           subkelas: ["Inlet", "Manhole Drainase", "Sumur Resapan", "Zona Drainase"],
           chartData: [26.09, 26.09, 100, 100],
           jumlahData: ["7865 Fitur", "3363 Fitur", "2443 Fitur", "387 km"],
         },
         "Jaringan Fiber Optik": {
-          icon: "../assets/jaringan_fo.jpg",
+    icon: "<?= asset_url('jaringan_fo.jpg') ?>",
           desc: "Jaringan Fiber Optik merupakan teknologi transmisi data yang menggunakan bahan serat kaca atau plastik untuk menstransmisikan sinyal cahaya dari satu lokasi ke lokasi lainnya yang mencakup kabel fiber optik, manhole fiber optik, dan tiang fiber optik.",
           subkelas: ["Kabel Fiber Optik", "Manhole Fiber Optik", "Tiang Fiber Optik"],
           chartData: [26.09, 26.09, 26.09],
           jumlahData: ["324 km", "341 Fitur", "1960 Fitur"],
         },
         "Jaringan Instalasi Pengolahan Air Limbah": {
-          icon: "../assets/jaringan_ipal.jpg",
+    icon: "<?= asset_url('jaringan_ipal.jpg') ?>",
           desc: "Berdasarkan Peraturan Menteri Pekerjaan Umum dan Perumahan Rakyat Republik Indonesia Nomor 4/PRT/M/2017 tentang Penyelenggaraan Sistem Pengelolaan Air Limbah Domestik (SPALD), bahwa sistem pengelolaan air limbah domestik adalah serangkaian kegiatan pengelolaan air limbah domestik dalam satu kesatuan dengan prasarana dan sarana pengelolaan air limbah domestik.",
           subkelas: ["Manhole Saluran Air Limbah", "Pipa Induk", "Pipa Glontor", "Pipa Lateral"],
           chartData: [26.09, 100, 100, 100],
           jumlahData: ["1511 Fitur", "58 km", "115 km", "22 km"],
         },
         "Jaringan Jalan": {
-          icon: "../assets/jaringan_jalan.jpg",
+    icon: "<?= asset_url('jaringan_jalan.jpg') ?>",
           desc: "Berdasarkan Undang-Undang Republik Indonesia Nomor 38 Tahun 2004 tentang Jalan, bahwa jalan adalah prasarana trasnportasi darat yang meliputi segala bagian jalan, termasuk bangunan pelengkap dan perlengkapannya yang diperuntukkan bagi lalu lintas, yang berada pada permukaan tanah, di atas permukaan tanah, di bawah permukaan tanah dan/atau air, serta di atas permukaan air, kecuali jalan kereta api, jalan lori, dan jalan kabel.",
           subkelas: ["Jembatan", "Jalan Lingkungan", "Jalan Kota", "Jalur Pemandu", "Trotoar"],
           chartData: [100, 100, 100, 26.09, 100],
           jumlahData: ["54 Fitur", "594 km", "230 km", 0, 0],
         },
         "Jaringan Listrik": {
-          icon: "../assets/jaringan_listrik.jpg",
+    icon: "<?= asset_url('jaringan_listrik.jpg') ?>",
           desc: "Berdasarkan Peraturan Menteri Energi dan Sumber Daya Mineral Republik Indonesia Nomor 20 Tahun 2020 Tentang Aturan Jaringan Sistem Tenaga Listrik (Grid Code), bahwa sistem tenaga listrik adalah suatu ranglaian dalam tenaga listrik yang berfungsi untuk menyalurkan tenaga listrik dari pembangkit tenaga listrik ke konsumen tenaga listrik.",
           subkelas: ["Jaringan Kabel Listrik Tegangan Menengah", "Jaringan Kabel Listrik Tegangan Rendah", "Rumah Kabel", "Tiang Listrik", "Trafo Listrik"],
           chartData: [100, 100, 8.70, 26.09, 8.70],
           jumlahData: ["190 km", "232 km", "115 Fitur", "2771 Fitur", "310 Fitur"],
         },
         "Jaringan Perusahaan Daerah Air Minum": {
-          icon: "../assets/jaringan_pdam.jpg",
+    icon: "<?= asset_url('jaringan_pdam.jpg') ?>",
           desc: "Berdasarkan Peraturan Menteri Pekerjaan Umum dan Perumahan Rakyat Republik Indonesia Nomor 4 Tahun 2020 tentang Prosedur Operasional Standar Penyelenggaraan Sistem Penyediaan Air Minum, bahwa sistem penyediaan air minum merupakan satu kesatuan sarana dan prasarana penyediaan air minum yang mengikuti proses dasar manajemen untuk penyediaan air minum kepada masyarakat.",
           subkelas: ["Jaringan Perusahaan Daerah Air Minum"],
           chartData: [100],
           jumlahData: ["699 km"],
         },
         "Sungai": {
-          icon: "../assets/sungai.jpg",
+    icon: "<?= asset_url('sungai.jpg') ?>",
           desc: "Berdasarkan Peraturan Pemerintah Republik Indonesia Nomor 38 Tahun 2011 tentang Sungai, bahwa sungai adalah alur atau wadah air alami dan/atau buatan berupa jaringan pengaliran air beserta air di dalamnya, mulai dari hulu sampai muara, dengan dibatasi kanan dan kiri oleh garis sempadan.",
           subkelas: ["Sungai"],
           chartData: [100],
