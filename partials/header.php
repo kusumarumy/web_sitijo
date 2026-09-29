@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/helpers.php'; ?>
 <header class="header">
   <div class="logo-group">
 <img src="<?= asset_url('jogja.png') ?>" alt="Logo Jogja">
