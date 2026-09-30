@@ -4,14 +4,23 @@ ini_set('display_startup_errors', 1);
 ini_set('memory_limit','1024M');
 error_reporting(E_ALL);
 ob_start();
-session_start();
+require_once __DIR__ . '/../db/koneksi.php';
+require_once __DIR__ . '/../auth/cek_role.php';
+require_once __DIR__ . '/../log/log_akses.php';
 
-include '../../backend/db/koneksi.php';
-include '../../backend/auth/cek_role.php';
-include __DIR__ . '/../log/log_akses.php';
+if (!isset($_SESSION['user'])) {
+    die("<script>
+        alert('Sesi pengguna berakhir. Silakan login kembali.');
+        window.location.href = '/index.php';
+    </script>");
+}
 
-logAkses($conn, $_SESSION['user'], "update_data.php", "Memperbaharui atribut data penunjang infrastruktur.");
-
+logAkses(
+    $conn,
+    $_SESSION['user'],
+    "update_data.php",
+    "Memperbaharui atribut data penunjang infrastruktur."
+);
 $captcha_code = strtoupper(substr(md5(rand()), 0, 5));
 $_SESSION['captcha_code'] = $captcha_code;
 
