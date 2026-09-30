@@ -1,6 +1,7 @@
 <?php
 require_once '../../backend/db/koneksi.php';
 require_once '../../backend/auth/cek_role.php';
+require_once __DIR__ . '/../../partials/helpers.php';
 include __DIR__ . '/../log/log_akses.php';
 logAkses($conn, $_SESSION['user'], "tambah_data.php", "Menambah data spasial dan data non spasial infrastruktur.");
 
@@ -287,18 +288,37 @@ if (!isset($_SESSION['user'])) {
                                 <i class="bi bi-chevron-down"></i>
                             </div>
                             <ul class="accordion-content">
-                                <?php foreach ($subs as $sub): ?>
-                                    <li>
-                                       <a href="<?= asset_url('form/' . $sub . '.zip') ?>"
-   class="download-btn"
-   download>
-    <i class="bi bi-file-earmark-zip-fill"></i>
-    <?= $label_subkelas[$sub] ?? $sub ?>.zip
-</a>
-                                            <i class="bi bi-file-earmark-zip-fill"></i> <?= $label_subkelas[$sub] ?? $sub ?>.zip
-                                        </a>
-                                    </li>
-                                <?php endforeach; ?>
+<?php foreach ($kelas_subkelas as $kelas => $subs): ?>
+
+    <div class="accordion-item">
+
+        <div class="accordion-header">
+            <?= $kelas_label_icon[$kelas] ?? ucfirst(str_replace('_', ' ', $kelas)) ?>
+            <i class="bi bi-chevron-down"></i>
+        </div>
+
+        <ul class="accordion-content">
+
+            <?php foreach ($subs as $sub): ?>
+
+                <li>
+                    <a
+                        href="<?= htmlspecialchars(asset_url('form/' . $sub . '.zip'), ENT_QUOTES, 'UTF-8') ?>"
+                        class="download-btn"
+                        download
+                    >
+                        <i class="bi bi-file-earmark-zip-fill"></i>
+                        <?= htmlspecialchars($label_subkelas[$sub] ?? $sub) ?>.zip
+                    </a>
+                </li>
+
+            <?php endforeach; ?>
+
+        </ul>
+
+    </div>
+
+<?php endforeach; ?>
                             </ul>
                         </div>
                     <?php endforeach; ?>
