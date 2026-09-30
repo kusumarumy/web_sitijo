@@ -220,7 +220,6 @@ if (!isset($_SESSION['user'])) {
           </p>
                 <div id="accordionContainer">
                     <?php
-                    $base_path = "/assets/form";
                     $kelas_subkelas = [
                         "atribut_jalan" => ["cermin_jalan", "kamera_pengawas", "lampu_jalan", "lampu_lalin", "rambu_lalin"],
                         "halte" => ["jalur_halte", "titik_halte"],
@@ -290,7 +289,12 @@ if (!isset($_SESSION['user'])) {
                             <ul class="accordion-content">
                                 <?php foreach ($subs as $sub): ?>
                                     <li>
-                                        <a href="<?= "$base_path/$sub.zip" ?>" class="download-btn" download>
+                                       <a href="<?= asset_url('form/' . $sub . '.zip') ?>"
+   class="download-btn"
+   download>
+    <i class="bi bi-file-earmark-zip-fill"></i>
+    <?= $label_subkelas[$sub] ?? $sub ?>.zip
+</a>
                                             <i class="bi bi-file-earmark-zip-fill"></i> <?= $label_subkelas[$sub] ?? $sub ?>.zip
                                         </a>
                                     </li>
