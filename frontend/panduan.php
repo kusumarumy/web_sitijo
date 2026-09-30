@@ -2,12 +2,7 @@
 session_start();
 require_once dirname(__DIR__) . '/partials/helpers.php';
 
-/*
- * URL PDF dari R2
- * Pastikan file di R2 berada di:
- * assets/Panduan WEBGIS SITIJO.pdf
- */
-$pdfPanduan = asset_url('Panduan WEBGIS SITIJO.pdf');
+$pdfPanduan = asset_url('panduan-webgis-sitijo.pdf');
 ?>
 
 <!DOCTYPE html>
