@@ -221,6 +221,7 @@ if (!isset($_SESSION['user'])) {
           </p>
                 <div id="accordionContainer">
                     <?php
+                    $base_path = asset_url('form');
                     $kelas_subkelas = [
                         "atribut_jalan" => ["cermin_jalan", "kamera_pengawas", "lampu_jalan", "lampu_lalin", "rambu_lalin"],
                         "halte" => ["jalur_halte", "titik_halte"],
@@ -288,37 +289,13 @@ if (!isset($_SESSION['user'])) {
                                 <i class="bi bi-chevron-down"></i>
                             </div>
                             <ul class="accordion-content">
-<?php foreach ($kelas_subkelas as $kelas => $subs): ?>
-
-    <div class="accordion-item">
-
-        <div class="accordion-header">
-            <?= $kelas_label_icon[$kelas] ?? ucfirst(str_replace('_', ' ', $kelas)) ?>
-            <i class="bi bi-chevron-down"></i>
-        </div>
-
-        <ul class="accordion-content">
-
-            <?php foreach ($subs as $sub): ?>
-
-                <li>
-                    <a
-                        href="<?= htmlspecialchars(asset_url('form/' . $sub . '.zip'), ENT_QUOTES, 'UTF-8') ?>"
-                        class="download-btn"
-                        download
-                    >
-                        <i class="bi bi-file-earmark-zip-fill"></i>
-                        <?= htmlspecialchars($label_subkelas[$sub] ?? $sub) ?>.zip
-                    </a>
-                </li>
-
-            <?php endforeach; ?>
-
-        </ul>
-
-    </div>
-
-<?php endforeach; ?>
+                                <?php foreach ($subs as $sub): ?>
+                                    <li>
+                                        <a href="<?= "$base_path/$sub.zip" ?>" class="download-btn" download>
+                                            <i class="bi bi-file-earmark-zip-fill"></i> <?= $label_subkelas[$sub] ?? $sub ?>.zip
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
                             </ul>
                         </div>
                     <?php endforeach; ?>
