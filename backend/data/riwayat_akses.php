@@ -5,20 +5,40 @@ include __DIR__ . '/../../backend/auth/cek_role.php';
 include __DIR__ . '/../log/log_akses.php';
 
 $unit = $_SESSION['user']['unit'] ?? '';
-logAkses($conn, $_SESSION['user'], "riwayat_akses.php", "Melihat riwayat akses pengguna.");
 
 if ($unit !== 'admin') {
-    logAkses($conn, $_SESSION['user'], "riwayat_akses.php", "Akses Ditolak", "User mencoba membuka menu admin");
-    echo "<script>alert('Akses ditolak!'); window.location.href='/index.php';</script>";
+    logAkses(
+        $conn,
+        $_SESSION['user'],
+        "riwayat_akses.php",
+        "Akses Ditolak",
+        "User mencoba membuka menu admin"
+    );
+
+    echo "<script>
+        alert('Akses ditolak!');
+        window.location.href='/index.php';
+    </script>";
     exit();
 }
+
+logAkses(
+    $conn,
+    $_SESSION['user'],
+    "riwayat_akses.php",
+    "Melihat riwayat akses pengguna."
+);
 
 include __DIR__ . '/../../partials/header.php';
 include __DIR__ . '/../../partials/sidebar.php';
 
 $sql = "SELECT * FROM log_akses ORDER BY waktu_akses DESC";
-$result = $conn->query($sql);
-$logs = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+
+$stmt = $conn->query($sql);
+
+$logs = $stmt
+    ? $stmt->fetchAll(PDO::FETCH_ASSOC)
+    : [];
 ?>
 
 <!DOCTYPE html>
@@ -63,7 +83,7 @@ $logs = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
                 <?php foreach ($logs as $i => $log): ?>
                 <tr>
                     <td><?= $i + 1 ?></td>
-                    <td><?= $log['waktu_akses'] ?></td>
+                    <td><?= htmlspecialchars($log['waktu_akses'] ?? '') ?></td>
                     <td><?= htmlspecialchars($log['username'] ?? '') ?></td>
                     <td><?= htmlspecialchars($log['unit'] ?? '') ?></td>
                     <td><?= htmlspecialchars($log['menu'] ?? '') ?></td>
@@ -103,20 +123,27 @@ $logs = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
                 ]
             });
             $('#filterBtn').on('click', function() {
-                var start = $('#startDate').val();
-                var end = $('#endDate').val();
-                $.fn.dataTable.ext.search.push(
-                    function(settings, data, dataIndex) {
-                        var date = data[1]; 
-                        if ((start === "" || date >= start) && (end === "" || date <= end)) {
-                            return true;
-                        }
-                        return false;
-                    }
-                );
-                table.draw();
-                $.fn.dataTable.ext.search.pop();
-            });
+    var start = $('#startDate').val();
+    var end = $('#endDate').val();
+
+    $.fn.dataTable.ext.search.push(
+        function(settings, data, dataIndex) {
+            var date = data[1].substring(0, 10);
+
+            if (
+                (start === "" || date >= start) &&
+                (end === "" || date <= end)
+            ) {
+                return true;
+            }
+
+            return false;
+        }
+    );
+
+    table.draw();
+    $.fn.dataTable.ext.search.pop();
+});
             $('#clearFilterBtn').on('click', function() {
                 $('#startDate').val('');
                 $('#endDate').val('');
